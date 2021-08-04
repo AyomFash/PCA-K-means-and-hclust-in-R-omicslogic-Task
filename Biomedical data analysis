@@ -1,0 +1,42 @@
+library(ggfortify)
+ library(ggplot2)
+ library(stats)
+ library (tools)
+ 
+ # load data from path or cd
+ data <- read.table("LIHC_BRCA_data1_marked_no0.txt", sep= '\t', header = T, row.names = 1, stringsAsFactors = FALSE, check.names = F)
+ # create an object for sample names
+ Group <- t(data [1,])
+ # create object for column names
+ cnames <- colnames(data)
+ 
+ # reload data
+ df <-  read.table("LIHC_BRCA_data1_marked_no0.txt", sep = '\t', header = T, row.names = 1, skip = 1,stringsAsFactors = FALSE, check.names = F)
+ 
+ # transpose df
+ dfT <- t(df)
+ # transform table to numeric 
+ dfT <- transform(dfT, as.numeric)
+ # create pca object
+ pca <- prcomp(dfT, scale =TRUE, center = TRUE)
+ # create object for pca result
+ pca_res <- data.frame(pca$x, Group)
+ # visualization of pca result with annotations
+ ggplot(pca_res, aes(x=PC1, y=PC2, colour=Group)) +geom_point()
+ 
+ #hierachical clustering- Define clustering and save in a object
+ cl <- hclust (dist(dfT, 'euclidian'), method='ward.D2')
+ 
+ #Define parameters and save in object
+ descr1 <- paste ("Distance: ", "euclidean", sep="")
+ descr2 <- paste ("Linkage: ", "ward.D2", sep="")
+ 
+ #Plot Clusters
+ plot(cl, xlab=descr1, sub=descr2, cex = 0.8)
+
+ # K-means clustering
+ kmeans <- kmeans(dfT,4)
+ cluster_res <- data.frame(kmeans$cluster, Group)
+ kmeans$cluster
+ 
+ 
